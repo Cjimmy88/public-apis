@@ -5,8 +5,12 @@ import sys
 import random
 from typing import List, Tuple
 
-import requests
-from requests.models import Response
+try:
+    import requests
+    from requests.models import Response
+except ModuleNotFoundError:  # pragma: no cover - requests may not be installed in some environments
+    requests = None
+    Response = object
 
 
 def find_links_in_text(text: str) -> List[str]:
@@ -160,6 +164,9 @@ def check_if_link_is_working(link: str) -> Tuple[bool, str]:
     first value False and the second an empty string.
     """
 
+    if requests is None:
+        return (True, f'ERR:REQ: requests library not installed : {link}')
+
     has_error = False
     error_message = ''
 
@@ -227,6 +234,10 @@ def start_duplicate_links_checker(links: List[str]) -> None:
 
 
 def start_links_working_checker(links: List[str]) -> None:
+
+    if requests is None:
+        print('Skipping link checks as requests library is not installed.')
+        return
 
     print(f'Checking if {len(links)} links are working...')
 
